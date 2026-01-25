@@ -1,0 +1,31 @@
+================================================================
+PROBLEM NAME: 344. Reverse String
+DIFFICULTY: Easy
+LINK: https://leetcode.com/problems/reverse-string/
+================================================================
+
+--- PROBLEM DESCRIPTION ---
+The task is to write a function that reverses a given string, which is provided as an array of characters 's'. 
+
+The key requirement is that the modification must be done "in-place." This means you are not allowed to allocate extra space for another array; you must rearrange the elements within the existing array provided in the input.
+
+--- CONSTRAINTS & GOALS ---
+* Goal: Reverse the character array such that the first element becomes the last, the second becomes the second-to-last, and so on.
+* Memory Constraint: Must use $O(1)$ extra memory.
+* Input Size: The array length can be up to $10^5$.
+* Character Type: Elements are printable ASCII characters.
+
+--- CONCEPTUAL LOGIC ---
+To solve this under the $O(1)$ memory constraint, a two-pointer approach is typically used:
+1. One pointer starts at the beginning of the array.
+2. A second pointer starts at the end of the array.
+3. The elements at these two positions are swapped.
+4. The pointers then move toward the center (increment the start, decrement the end) and the process repeats until they meet.
+
+
+
+--- COMPLEXITY ANALYSIS ---
+* Time Complexity: $O(n)$, where $n$ is the length of the string. Each element is visited at most once.
+* Space Complexity: $O(1)$, as no additional data structures are used regardless of input size.
+
+----------------------------------------------------------------

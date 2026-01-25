@@ -3,8 +3,7 @@ def twoSum(numbers,target):
     if length<=1: return False
     l=0
     r=length-1
-    while l<=r:
-        print("Hi")
+    while l<r:
         if numbers[l]+numbers[r]==target:
             return [l+1,r+1]
         elif numbers[l]+numbers[r]>target:
