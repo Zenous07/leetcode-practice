@@ -1,0 +1,62 @@
+# Remove Duplicates from Sorted List
+
+## 🧩 Problem Overview
+Given the head of a **sorted linked list**, remove all duplicate elements so that
+each value appears only once.
+
+The linked list must remain **sorted**, and the modified list should be returned.
+
+---
+
+## 💡 Solution: Single Pointer Traversal
+
+### **Method Used**
+Iterative Traversal with Pointer Comparison
+
+### **Main Idea**
+Because the linked list is already **sorted**, duplicate values will always appear
+**next to each other**.
+
+By traversing the list once and comparing each node with its next node,
+duplicates can be detected and removed efficiently.
+
+---
+
+## 🛠️ Detailed Explanation
+1. Start from the head of the linked list.
+2. Traverse the list using a pointer (`current`).
+3. For each node:
+   - Compare its value with the value of the next node.
+4. If both values are the same:
+   - Skip the next node by updating the `next` pointer.
+5. If the values are different:
+   - Move the pointer forward.
+6. Continue until the end of the list is reached.
+7. Return the modified head of the linked list.
+
+---
+
+## ⏱️ Complexity
+Time Complexity: O(n)  
+Space Complexity: O(1)
+
+---
+
+## 🆚 Comparison Summary
+
+| Aspect | Extra Data Structure | In-Place Traversal |
+|------|---------------------|-------------------|
+| Time Complexity | O(n) | O(n) |
+| Space Complexity | O(n) | O(1) |
+| Technique | Hash Set | Pointer Update |
+| Performance | Good | Optimal |
+| Recommended | ❌ No | ✅ Yes |
+
+---
+
+## 🏁 Conclusion
+Since the linked list is already sorted, duplicates can be removed efficiently
+using a **single traversal**.
+
+The in-place pointer approach is optimal, requires no extra memory,
+and is the preferred solution for this problem.
