@@ -58,13 +58,13 @@ If a node is `null`, its depth is `0`.
 ### **Example Walkthrough**
 
 Input:
-
+``` text
     3
    / \
   9  20
      / \
     15  7
-
+```
 Step-by-step:
 
 * Node 9 has depth 1.
