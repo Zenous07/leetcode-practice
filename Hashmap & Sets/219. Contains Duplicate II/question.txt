@@ -1,0 +1,45 @@
+219. Contains Duplicate II
+
+Difficulty: Easy
+
+Problem Statement:
+Given an integer array nums and an integer k, return true if there are two distinct indices i and j in the array such that nums[i] == nums[j] and abs(i - j) <= k.
+
+---
+
+Example 1:
+Input: nums = [1,2,3,1], k = 3
+Output: true
+
+Explanation:
+The value 1 appears at indices 0 and 3.
+The absolute difference between the indices is |0 - 3| = 3, which is less than or equal to k.
+Therefore, the answer is true.
+
+---
+
+Example 2:
+Input: nums = [1,0,1,1], k = 1
+Output: true
+
+Explanation:
+The value 1 appears at indices 2 and 3.
+The absolute difference between the indices is |2 - 3| = 1, which is equal to k.
+Therefore, the answer is true.
+
+---
+
+Example 3:
+Input: nums = [1,2,3,1,2,3], k = 2
+Output: false
+
+Explanation:
+Although there are duplicate values, every pair of equal elements is more than 2 indices apart.
+Therefore, no valid pair exists, and the answer is false.
+
+---
+
+Constraints:
+1 <= nums.length <= 10^5
+-10^9 <= nums[i] <= 10^9
+0 <= k <= 10^5
