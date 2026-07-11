@@ -229,3 +229,6 @@ create a md file for this '      ' exactly like this format and i want your rrep
    The Prefix–Suffix Product Method is the optimal solution as it satisfies all constraints efficiently.
    The Brute Force method is useful for understanding but not suitable for large inputs.
    "
+
+
+   
