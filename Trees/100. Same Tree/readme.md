@@ -4,11 +4,16 @@
 
 You are given the roots of two binary trees, `p` and `q`.
 
-Your task is to determine whether the two trees are exactly the same.
+Your task is to determine whether the two trees are **identical**.
 
-Two binary trees are considered identical if they have the same structure and every corresponding node contains the same value.
+Two binary trees are considered the same if:
 
-The function should return `True` if the trees are identical; otherwise, return `False`.
+- They have the same structure.
+- Corresponding nodes contain the same values.
+- Every left child matches the corresponding left child.
+- Every right child matches the corresponding right child.
+
+Return `True` if both trees are identical; otherwise, return `False`.
 
 ---
 
@@ -16,59 +21,58 @@ The function should return `True` if the trees are identical; otherwise, return 
 
 ### **Method Used**
 
-Queue-Based Level Order Traversal (BFS)
+Queue-Based Parallel Traversal (BFS)
 
 ### **Main Idea**
 
-Traverse both binary trees simultaneously using two queues.
+Traverse both trees simultaneously using two queues.
 
-For every pair of corresponding nodes:
+For every pair of nodes:
 
-* Compare their values.
-* Check whether both have left children.
-* Check whether both have right children.
-* If both corresponding children exist, add them to their respective queues.
-* If any structural mismatch or value mismatch is found, immediately return `False`.
+- Compare their values.
+- Ensure both have matching left children.
+- Ensure both have matching right children.
+- Continue checking until every node has been visited.
 
-If the traversal completes without finding any differences, the two trees are identical.
+If every comparison succeeds, the trees are identical.
 
 ---
 
 ### **Detailed Explanation**
 
-1. Handle the edge cases:
+1. Handle the initial edge cases.
 
-   * If one tree is empty while the other is not, return `False`.
-   * If both trees are empty, return `True`.
+   - If one tree is empty while the other is not, return `False`.
+   - If both trees are empty, return `True`.
 
-2. Create two queues:
+2. Create two queues.
 
-   * Add the root of the first tree to the first queue.
-   * Add the root of the second tree to the second queue.
+   - One queue stores nodes from the first tree.
+   - The other queue stores nodes from the second tree.
 
-3. Traverse both trees while the queues are not empty:
+3. Traverse both trees together.
 
-   * Remove one node from each queue.
-   * Compare their values.
-   * If the values differ, return `False`.
+   - Remove one node from each queue.
+   - Compare their values.
+   - If the values differ, return `False`.
 
-4. Check the left children:
+4. Compare the left children.
 
-   * If both nodes have left children, add them to their respective queues.
-   * If only one node has a left child, return `False`.
+   - If both exist, add them to their respective queues.
+   - If only one exists, the structures differ, so return `False`.
 
-5. Check the right children:
+5. Compare the right children.
 
-   * If both nodes have right children, add them to their respective queues.
-   * If only one node has a right child, return `False`.
+   - If both exist, add them to their respective queues.
+   - If only one exists, return `False`.
 
-6. Continue until all corresponding nodes have been processed.
+6. Continue until both queues become empty.
 
-7. If both queues become empty together without finding any mismatch, return `True`.
+7. If every comparison succeeds and both queues finish together, return `True`.
 
 ---
 
-### **Example Walkthrough**
+### **Example Walkthrough 1**
 
 Tree 1:
 
@@ -86,32 +90,144 @@ Tree 2:
     2   3
 ```
 
-Step-by-step:
+Processing:
 
-* Compare root nodes → 1 == 1
-* Compare left children → 2 == 2
-* Compare right children → 3 == 3
-* Both trees finish traversal simultaneously.
-* Return `True`.
+- Compare 1 and 1 ✓
+- Compare 2 and 2 ✓
+- Compare 3 and 3 ✓
+
+Every node matches.
+
+Output:
+
+```text
+True
+```
+
+---
+
+### **Example Walkthrough 2**
+
+Tree 1:
+
+```text
+      1
+     / \
+    2   1
+```
+
+Tree 2:
+
+```text
+      1
+     / \
+    1   2
+```
+
+Processing:
+
+- Compare root nodes ✓
+- Compare left children → 2 ≠ 1 ✗
+
+The node values differ.
+
+Output:
+
+```text
+False
+```
+
+---
+
+### **Example Walkthrough 3**
+
+Tree 1:
+
+```text
+      1
+     /
+    2
+```
+
+Tree 2:
+
+```text
+      1
+       \
+        2
+```
+
+Processing:
+
+- Compare root nodes ✓
+- One tree has a left child while the other has a right child.
+
+The structures are different.
+
+Output:
+
+```text
+False
+```
+
+---
+
+### **Example Walkthrough 4**
+
+Tree 1:
+
+```text
+Empty Tree
+```
+
+Tree 2:
+
+```text
+Empty Tree
+```
+
+Processing:
+
+- Both trees are empty.
+
+Output:
+
+```text
+True
+```
+
+---
+
+### **Why Two Queues?**
+
+Each queue traverses one tree level by level.
+
+At every step:
+
+- Nodes are removed together.
+- Their values are compared.
+- Their children are checked in the same positions.
+
+Since both traversals stay synchronized, any difference in structure or values is detected immediately.
 
 ---
 
 ### **Complexity**
 
-Time Complexity: O(n)
+**Time Complexity:** O(n)
 
-* Every node in both trees is visited exactly once.
+- Every node in both trees is visited exactly once.
 
-Space Complexity: O(n)
+**Space Complexity:** O(n)
 
-* The queues may store up to one level of the trees in the worst case.
+- In the worst case, the queues may contain an entire level of the trees.
 
 ---
 
 ## 🏁 Conclusion
 
-Using Breadth-First Search (BFS), both trees are traversed level by level at the same time.
+Using Breadth-First Search (BFS), we compare both binary trees level by level.
 
-By comparing node values and verifying that the structure matches throughout the traversal, we can efficiently determine whether the two binary trees are identical.
+By checking node values and ensuring corresponding left and right children exist in the same positions, we can determine whether the two trees are identical.
 
-This approach is simple, effective, and runs in linear time.
+This approach is simple, efficient, and guarantees a correct result with linear time complexity.

@@ -236,7 +236,7 @@ create a md file for this '      ' exactly like this format and i want your rrep
 
 #trees
 
-create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file", here is the format "# Invert Binary Tree
+create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file" also feel free to add more examples, here is the format "# Invert Binary Tree
 
    ## 🧩 Problem Overview
 
