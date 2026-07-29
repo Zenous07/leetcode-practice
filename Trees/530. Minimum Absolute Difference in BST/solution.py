@@ -6,9 +6,9 @@ def minAbsDiff(root):
     while q:
         node = q.pop(0)
         if node.left:
-            minDiff=min(minDiff,node.val-node.left.val)
+            minDiff=min(minDiff,abs(node.val-node.left.val))
             q.append(node.left)
         if node.right:
-            minDiff=min(minDiff,node.val,node.right.val)
+            minDiff=min(minDiff,abs(node.val,node.right.val))
             q.append(node.right)
     return minDiff
