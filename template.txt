@@ -47,7 +47,7 @@ create a txt file for this '     ' exactly like this format and i want your reps
 
 
 
-create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file", here is the format "# Single Number
+create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file" also you are free to add examples of your wish, here is the format "# Single Number
 
    ## 🧩 Problem Overview
 
