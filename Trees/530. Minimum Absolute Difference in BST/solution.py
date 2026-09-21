@@ -1,14 +1,19 @@
 def minAbsDiff(root):
-    if not root:
-        return 0
-    minDiff=0
-    q=[root]
-    while q:
-        node = q.pop(0)
-        if node.left:
-            minDiff=min(minDiff,abs(node.val-node.left.val))
-            q.append(node.left)
-        if node.right:
-            minDiff=min(minDiff,abs(node.val,node.right.val))
-            q.append(node.right)
-    return minDiff
+    prev = None
+    minV = float('inf')
+    
+    def inOrder(node):
+        nonlocal prev, minV
+        if not node:
+            return
+            
+        inOrder(node.left)
+        
+        if prev is not None:
+            minV = min(minV, node.val - prev.val)
+        prev = node
+        
+        inOrder(node.right)
+        
+    inOrder(root)
+    return minV

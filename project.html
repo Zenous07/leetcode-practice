@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stanley Controller — Live Simulation</title>
+<style>
+  :root{
+    --bg:#0b0e11;
+    --panel:#12161b;
+    --line:#1f262e;
+    --text:#e6ecf1;
+    --dim:#7c8894;
+    --accent:#3ddc84;
+    --warn:#ff5c5c;
+    --amber:#ffb347;
+    --mono: 'SF Mono', 'Consolas', 'Menlo', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+    padding:24px 16px 40px;
+  }
+  .wrap{width:100%; max-width:980px;}
+  header{
+    display:flex; justify-content:space-between; align-items:baseline;
+    border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:18px;
+  }
+  h1{font-size:19px; font-weight:600; letter-spacing:0.2px;}
+  h1 span{color:var(--accent); font-family:var(--mono); font-weight:700;}
+  .subtitle{color:var(--dim); font-size:12.5px; font-family:var(--mono);}
+
+  .layout{display:grid; grid-template-columns: 1fr 260px; gap:16px;}
+  @media (max-width:760px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px;
+  }
+  canvas{width:100%; display:block; border-radius:6px; background:#0e1116;}
+  #strip{margin-top:10px; height:110px;}
+
+  .lap-badge{
+    position:relative; margin-top:8px; display:flex; justify-content:space-between;
+    font-family:var(--mono); font-size:11px; color:var(--dim);
+  }
+
+  .readout{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px;
+  }
+  .stat{
+    background:#0e1116; border:1px solid var(--line); border-radius:8px;
+    padding:10px 12px;
+  }
+  .stat .label{font-size:10.5px; color:var(--dim); text-transform:uppercase; letter-spacing:0.6px;}
+  .stat .value{font-family:var(--mono); font-size:20px; margin-top:4px; font-weight:600;}
+  .stat.err .value{color:var(--accent);}
+  .stat.err.high .value{color:var(--warn);}
+
+  .controls{display:flex; flex-direction:column; gap:18px;}
+  .ctrl-group label{
+    display:flex; justify-content:space-between; font-size:12.5px; color:var(--dim);
+    margin-bottom:6px;
+  }
+  .ctrl-group label b{color:var(--text); font-family:var(--mono); font-weight:600;}
+  input[type=range]{
+    width:100%; -webkit-appearance:none; height:4px; border-radius:2px;
+    background:var(--line); outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:15px; height:15px; border-radius:50%;
+    background:var(--accent); cursor:pointer; border:2px solid #0e1116;
+  }
+  .btnrow{display:flex; gap:8px; margin-top:4px;}
+  button{
+    flex:1; background:#0e1116; border:1px solid var(--line); color:var(--text);
+    padding:9px 10px; border-radius:7px; font-size:12.5px; cursor:pointer;
+    font-family:inherit; transition:border-color .15s;
+  }
+  button:hover{border-color:var(--accent);}
+  button.primary{background:var(--accent); color:#06110b; border-color:var(--accent); font-weight:600;}
+  button.primary:hover{opacity:0.9;}
+  button.active{border-color:var(--amber); color:var(--amber);}
+
+  .legend{display:flex; gap:14px; margin-top:10px; font-size:11px; color:var(--dim); flex-wrap:wrap;}
+  .legend span{display:inline-flex; align-items:center; gap:5px;}
+  .dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+
+  footer{margin-top:14px; color:var(--dim); font-size:11.5px; font-family:var(--mono); text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Stanley Controller <span>// live sim</span></h1>
+    <div class="subtitle">closed-loop circuit · runs indefinitely</div>
+  </header>
+
+  <div class="layout">
+    <div class="panel">
+      <canvas id="track" width="700" height="420"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:#4a5866"></i>reference path</span>
+        <span><i class="dot" style="background:#3ddc84"></i>driven path</span>
+        <span><i class="dot" style="background:#ff5c5c"></i>vehicle</span>
+      </div>
+
+      <canvas id="strip" width="700" height="110"></canvas>
+      <div class="lap-badge">
+        <span>cross-track error over time (scrolling, last 60s)</span>
+        <span id="lap-count">lap 0</span>
+      </div>
+
+      <div class="readout">
+        <div class="stat"><div class="label">Speed</div><div class="value" id="v-speed">0.0 m/s</div></div>
+        <div class="stat err" id="stat-e"><div class="label">Cross-track error</div><div class="value" id="v-e">0.00 m</div></div>
+        <div class="stat"><div class="label">Elapsed</div><div class="value" id="v-time">0.0 s</div></div>
+      </div>
+    </div>
+
+    <div class="panel controls">
+      <div class="ctrl-group">
+        <label>Target speed <b id="lbl-speed">15 m/s</b></label>
+        <input type="range" id="speed" min="2" max="30" step="1" value="15">
+      </div>
+      <div class="ctrl-group">
+        <label>Stanley gain (k) <b id="lbl-k">0.5</b></label>
+        <input type="range" id="gain" min="0.1" max="4" step="0.1" value="0.5">
+      </div>
+      <div class="ctrl-group">
+        <label>Playback rate <b id="lbl-rate">1×</b></label>
+        <input type="range" id="rate" min="1" max="8" step="1" value="1">
+      </div>
+      <div class="btnrow">
+        <button class="primary" id="btn-start">Start</button>
+        <button id="btn-reset">Reset</button>
+      </div>
+      <button id="btn-follow" class="active">Camera: Follow car</button>
+      <div style="font-size:11.5px; color:var(--dim); line-height:1.5; margin-top:2px;">
+        The track is a closed loop — the car laps it forever. Drag speed/gain any time
+        and watch the strip chart below the track to see how error settles or oscillates
+        over many laps. Use playback rate to fast-forward through long runs.
+      </div>
+    </div>
+  </div>
+  <footer>δ = θe + arctan(k·e / v) — Stanley steering law, evaluated every frame</footer>
+</div>
+
+<script>
+const canvas = document.getElementById('track');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+const strip = document.getElementById('strip');
+const sctx = strip.getContext('2d');
+const SW = strip.width, SH = strip.height;
+
+// ---- Reference path: CLOSED LOOP via periodic Catmull-Rom through waypoints ----
+const waypointsRaw = [
+  [0,0], [25,10], [45,-5], [55,15], [40,30], [15,25], [-10,15], [-15,-5], [10,-15]
+];
+function catmullRom(p0,p1,p2,p3,t){
+  const t2=t*t, t3=t2*t;
+  return 0.5*((2*p1)+(-p0+p2)*t+(2*p0-5*p1+4*p2-p3)*t2+(-p0+3*p1-3*p2+p3)*t3);
+}
+function buildLoopPath(pts, samplesPerSeg=40){
+  const n = pts.length;
+  const cx=[], cy=[];
+  for(let i=0;i<n;i++){
+    const p0=pts[(i-1+n)%n], p1=pts[i], p2=pts[(i+1)%n], p3=pts[(i+2)%n];
+    for(let s=0;s<samplesPerSeg;s++){
+      const t=s/samplesPerSeg;
+      cx.push(catmullRom(p0[0],p1[0],p2[0],p3[0],t));
+      cy.push(catmullRom(p0[1],p1[1],p2[1],p3[1],t));
+    }
+  }
+  return {cx, cy};
+}
+const {cx, cy} = buildLoopPath(waypointsRaw);
+const N = cx.length;
+const cyaw = cx.map((_,i)=>{
+  const j=(i+1)%N, k=(i-1+N)%N;
+  return Math.atan2(cy[j]-cy[k], cx[j]-cx[k]);
+});
+
+// ---- vehicle state ----
+let state, running=false, tAcc=0, lapCount=0, lastIdx=0;
+let errHistory = []; // {t, e}
+const dt = 0.05;
+const L = 2.9;
+const CAM_SCALE = 9; // px per meter, fixed since camera follows
+
+function normAngle(a){ return Math.atan2(Math.sin(a), Math.cos(a)); }
+
+function resetSim(){
+  state = { x: cx[0], y: cy[0], yaw: cyaw[0], v: 0, idx: 0 };
+  tAcc = 0; lapCount = 0; lastIdx = 0;
+  errHistory = [];
+  document.getElementById('v-e').textContent = '0.00 m';
+  document.getElementById('v-time').textContent = '0.0 s';
+  document.getElementById('v-speed').textContent = '0.0 m/s';
+  document.getElementById('lap-count').textContent = 'lap 0';
+  document.getElementById('stat-e').classList.remove('high');
+  drawTrack();
+  drawStrip();
+}
+
+function stanleyStep(){
+  const targetSpeed = parseFloat(document.getElementById('speed').value);
+  const k = parseFloat(document.getElementById('gain').value);
+
+  const fx = state.x + L*Math.cos(state.yaw);
+  const fy = state.y + L*Math.sin(state.yaw);
+  let best=Infinity, bi=state.idx;
+  // search a window ahead (wrapping) so it keeps tracking around the loop
+  for(let off=-10; off<=60; off++){
+    const i = ((state.idx+off)%N+N)%N;
+    const d = (cx[i]-fx)**2 + (cy[i]-fy)**2;
+    if(d<best){best=d; bi=i;}
+  }
+  // detect lap completion (index wrapped from near-end to near-start)
+  if(lastIdx > N-30 && bi < 30) lapCount++;
+  lastIdx = bi;
+  state.idx = bi;
+
+  const thetaE = normAngle(cyaw[bi]-state.yaw);
+  const dx = cx[bi]-fx, dy = cy[bi]-fy;
+  const nx = Math.sin(state.yaw+Math.PI/2), ny = Math.cos(state.yaw+Math.PI/2);
+  const e = -(dx*nx+dy*ny);
+
+  const v = Math.max(state.v, 0.1);
+  let delta = thetaE + Math.atan2(k*e, v);
+  delta = Math.max(-Math.PI/180*35, Math.min(Math.PI/180*35, delta));
+
+  const accel = 1.0*(targetSpeed-state.v);
+  state.x += state.v*Math.cos(state.yaw)*dt;
+  state.y += state.v*Math.sin(state.yaw)*dt;
+  state.yaw = normAngle(state.yaw + (state.v/L)*Math.tan(delta)*dt);
+  state.v += accel*dt;
+
+  tAcc += dt;
+  errHistory.push({t: tAcc, e});
+  const cutoff = tAcc - 60;
+  while(errHistory.length && errHistory[0].t < cutoff) errHistory.shift();
+
+  document.getElementById('v-e').textContent = e.toFixed(2)+' m';
+  document.getElementById('v-time').textContent = tAcc.toFixed(1)+' s';
+  document.getElementById('v-speed').textContent = state.v.toFixed(1)+' m/s';
+  document.getElementById('lap-count').textContent = 'lap '+lapCount;
+  document.getElementById('stat-e').classList.toggle('high', Math.abs(e)>1.5);
+}
+
+function drawTrack(){
+  ctx.clearRect(0,0,W,H);
+  const follow = document.getElementById('btn-follow').classList.contains('active');
+  let originX, originY;
+  if(follow){
+    originX = W/2 - state.x*CAM_SCALE;
+    originY = H/2 + state.y*CAM_SCALE;
+  } else {
+    const minX=Math.min(...cx)-10, maxX=Math.max(...cx)+10;
+    const minY=Math.min(...cy)-10, maxY=Math.max(...cy)+10;
+    const s = Math.min(W/(maxX-minX), H/(maxY-minY));
+    originX = -minX*s; originY = H+minY*s;
+    // override scale locally for non-follow mode
+    drawStatic(s, originX, originY);
+    return;
+  }
+
+  const toS = (x,y)=>[originX+x*CAM_SCALE, originY-y*CAM_SCALE];
+
+  // grid (scrolls with camera for motion feedback)
+  ctx.strokeStyle = '#161c23'; ctx.lineWidth=1;
+  const gridSize = 10*CAM_SCALE;
+  const offX = ((originX % gridSize)+gridSize)%gridSize;
+  const offY = ((originY % gridSize)+gridSize)%gridSize;
+  for(let gx=offX; gx<W; gx+=gridSize){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+  for(let gy=offY; gy<H; gy+=gridSize){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+
+  // reference path (closed loop)
+  ctx.strokeStyle = '#4a5866'; ctx.lineWidth=2; ctx.setLineDash([6,5]);
+  ctx.beginPath();
+  cx.forEach((x,i)=>{ const [sx,sy]=toS(x,cy[i]); i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy); });
+  ctx.closePath(); ctx.stroke(); ctx.setLineDash([]);
+
+  // driven trail (fades out behind, only show recent segment for perf)
+  ctx.strokeStyle = '#3ddc84'; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  let started=false;
+  for(let off=-120; off<=0; off++){
+    const i = ((state.idx+off)%N+N)%N;
+    const [sx,sy]=toS(cx[i],cy[i]);
+    started?ctx.lineTo(sx,sy):ctx.moveTo(sx,sy);
+    started=true;
+  }
+  ctx.stroke();
+
+  // vehicle
+  const [sx,sy] = toS(state.x, state.y);
+  ctx.fillStyle = '#ff5c5c';
+  ctx.beginPath(); ctx.arc(sx,sy,6,0,Math.PI*2); ctx.fill();
+  const hx = sx + 22*Math.cos(state.yaw), hy = sy - 22*Math.sin(state.yaw);
+  ctx.strokeStyle = '#ff5c5c'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(hx,hy); ctx.stroke();
+}
+
+function drawStatic(s, originX, originY){
+  const toS = (x,y)=>[originX+x*s, originY-y*s];
+  ctx.strokeStyle = '#4a5866'; ctx.lineWidth=2; ctx.setLineDash([6,5]);
+  ctx.beginPath();
+  cx.forEach((x,i)=>{ const [sx,sy]=toS(x,cy[i]); i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy); });
+  ctx.closePath(); ctx.stroke(); ctx.setLineDash([]);
+  const [sx,sy] = toS(state.x, state.y);
+  ctx.fillStyle = '#ff5c5c';
+  ctx.beginPath(); ctx.arc(sx,sy,6,0,Math.PI*2); ctx.fill();
+}
+
+function drawStrip(){
+  sctx.clearRect(0,0,SW,SH);
+  sctx.strokeStyle = '#1a2028'; sctx.lineWidth=1;
+  for(let gy=0; gy<=SH; gy+=SH/4){ sctx.beginPath(); sctx.moveTo(0,gy); sctx.lineTo(SW,gy); sctx.stroke(); }
+
+  // center zero-line
+  const midY = SH/2;
+  sctx.strokeStyle = '#2a323b'; sctx.beginPath(); sctx.moveTo(0,midY); sctx.lineTo(SW,midY); sctx.stroke();
+
+  if(errHistory.length<2) return;
+  const tMin = errHistory[0].t, tMax = errHistory[errHistory.length-1].t;
+  const span = Math.max(tMax-tMin, 1);
+  const maxAbsE = Math.max(2.5, ...errHistory.map(p=>Math.abs(p.e)));
+
+  sctx.strokeStyle = '#3ddc84'; sctx.lineWidth=1.8;
+  sctx.beginPath();
+  errHistory.forEach((p,i)=>{
+    const sx = ((p.t-tMin)/span)*SW;
+    const sy = midY - (p.e/maxAbsE)*(SH/2-6);
+    i===0?sctx.moveTo(sx,sy):sctx.lineTo(sx,sy);
+  });
+  sctx.stroke();
+
+  sctx.fillStyle = '#7c8894'; sctx.font = '10px monospace';
+  sctx.fillText(`±${maxAbsE.toFixed(1)}m`, 4, 12);
+}
+
+function loop(){
+  if(!running) return;
+  const rate = parseInt(document.getElementById('rate').value);
+  for(let i=0;i<rate;i++) stanleyStep();
+  drawTrack();
+  drawStrip();
+  requestAnimationFrame(loop);
+}
+
+document.getElementById('speed').addEventListener('input', e=>{
+  document.getElementById('lbl-speed').textContent = e.target.value+' m/s';
+});
+document.getElementById('gain').addEventListener('input', e=>{
+  document.getElementById('lbl-k').textContent = parseFloat(e.target.value).toFixed(1);
+});
+document.getElementById('rate').addEventListener('input', e=>{
+  document.getElementById('lbl-rate').textContent = e.target.value+'×';
+});
+document.getElementById('btn-start').addEventListener('click', e=>{
+  if(!running){
+    running = true;
+    e.target.textContent = 'Pause';
+    loop();
+  } else {
+    running = false;
+    e.target.textContent = 'Start';
+  }
+});
+document.getElementById('btn-reset').addEventListener('click', ()=>{
+  running = false;
+  document.getElementById('btn-start').textContent = 'Start';
+  resetSim();
+});
+document.getElementById('btn-follow').addEventListener('click', e=>{
+  e.target.classList.toggle('active');
+  const on = e.target.classList.contains('active');
+  e.target.textContent = on ? 'Camera: Follow car' : 'Camera: Full track';
+  if(!running) drawTrack();
+});
+
+resetSim();
+</script>
+</body>
+</html>
