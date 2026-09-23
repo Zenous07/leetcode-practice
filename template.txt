@@ -1,4 +1,4 @@
-create a txt file for this '     ' EXACTLY LIKE this format and i want your repsonse to be in able to copy in a single click like code you give for this also forget the tab space for the entire thing "136. Single Number
+create a txt file for this '     ' EXACTLY LIKE this format and i want your repsonse to be in able to copy in a single click like code and you need not create files you give me like i could copy in a single click like you used to give code "136. Single Number
 
    Difficulty: Easy
 
@@ -47,7 +47,7 @@ create a txt file for this '     ' EXACTLY LIKE this format and i want your reps
 
 
 
-create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file" also you are free to add examples of your wish, here is the format and you need not create files you give me like i could copy in a single click like you used to give code"# Single Number
+create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file" also you are free to add examples of your wish, here is the format "# Single Number
 
    ## 🧩 Problem Overview
 
@@ -140,7 +140,7 @@ create a md file for this '      ' exactly like this format and i want your reps
 
 
 
-create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and i dont you to add the code in the file, the first code i have pasted is the brute force and second code is the solution , "# Product of Array Except Self
+create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and i dont you to add the code in the file, the first code i have pasted is the brute force and second code is the solution ,and you need not create files you give me like i could copy in a single click like you used to give code "# Product of Array Except Self
 
    ## 🧩 Problem Overview
    Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].
@@ -236,7 +236,7 @@ create a md file for this '      ' exactly like this format and i want your reps
 
 #trees
 
-create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file" also feel free to add more examples, here is the format "# Invert Binary Tree
+create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file" also feel free to add more examples,and you need not create files you give me like i could copy in a single click like you used to give code here is the format "# Invert Binary Tree
 
    ## 🧩 Problem Overview
 
@@ -350,7 +350,7 @@ create a md file for this '      ' exactly like this format and i want your reps
 
 #grahs
 
-create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file" also feel free to add more examples and diagrams, here is the format "# Find if Path Exists in Graph
+create a md file for this '      ' exactly like this format and i want your repsonse to be in able to copy in a single click like code you give for this and #I" dont you to add the code in the file" also feel free to add more examples and diagrams,and you need not create files you give me like i could copy in a single click like you used to give code here is the format "# Find if Path Exists in Graph
 
    ## 🧩 Problem Overview
 
